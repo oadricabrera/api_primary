@@ -81,10 +81,7 @@ init_websocket_connection(
     error_handler=error_handler,
     exception_handler=exception_handler,
 )
-"""
-def print_market_data(msg):
-    print(f"\nMarket Data: {msg}")
-"""
+
 
 reporte_de_cuenta = get_account_report(account="REM9893", environment=Environment.REMARKET) 
 
@@ -93,17 +90,6 @@ print(f"\nReporte de cuenta: {reporte_de_cuenta}")
 market_data_subscription(["GGAL/DIC24"],[MarketDataEntry.BIDS,MarketDataEntry.OFFERS],depth=4)
 
 """
-
-add_websocket_error_handler(market_data_handler)
-
-add_websocket_market_data_handler(print_market_data)
-
-orden_enviada = send_order(["GGAL/DIC24"],side=Side.BUY,size=1,price=6670,order_type=OrderType.LIMIT)
-
-print(f"\nOrden Enviada: {orden_enviada}")
-
-add_websocket_order_report_handler(order_report_handler)
-
 print(f"\n{MarketDataEntry.__doc__}")
 
 

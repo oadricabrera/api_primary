@@ -3,9 +3,9 @@ from pyRofex import *
 # Set the the parameter for the REMARKET environment
 # item 2-Llamado al método get token
 initialize(
-    user="oadricabrera9893",
-    password="dkjtoG2@",
-    account="REM9893",
+    user="oadricabrera20096",
+    password="nvdevU6$",
+    account="REM20096",
     environment=Environment.REMARKET,
 )
 
