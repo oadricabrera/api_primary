@@ -2,19 +2,19 @@ from pyRofex import *
 
 # Set the the parameter for the REMARKET environment
 # item 2-Llamado al método get token
-# initialize(
-#     user="nickcheyney200120103",
-#     password="yzbasZ4$",
-#     account="REM20103",
-#     environment=Environment.REMARKET,
-# )
-
 initialize(
-    user="",
-    password="",
-    account="",
+    user="nickcheyney200120103",
+    password="yzbasZ4$",
+    account="REM20103",
     environment=Environment.REMARKET,
 )
+
+# initialize(
+#     user="",
+#     password="",
+#     account="",
+#     environment=Environment.REMARKET,
+# )
 
 
 def market_data_handler(message):
@@ -72,7 +72,12 @@ entries = [MarketDataEntry.BIDS, MarketDataEntry.OFFERS, MarketDataEntry.LAST]
 
 cuenta = get_account_report(account="REM20103",
     environment=Environment.REMARKET)
-print(cuenta.get("accountData"))
+
+print("data cuenta ->",cuenta)
+if "status" in  cuenta.keys():
+    print(cuenta.get("accountData").get("detailedAccountReports").get("0").get("availableToOperate").get("cash"))
+else:
+    print(cuenta.get("detailedAccountReports").get("0").get("availableToOperate").get("cash"))
 
 for simbolo in lista_simbolo:
     print("iniciando orden")
