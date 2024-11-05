@@ -2,10 +2,17 @@ from pyRofex import *
 
 # Set the the parameter for the REMARKET environment
 # item 2-Llamado al método get token
+# initialize(
+#     user="nickcheyney200120103",
+#     password="yzbasZ4$",
+#     account="REM20103",
+#     environment=Environment.REMARKET,
+# )
+
 initialize(
-    user="oadricabrera20096",
-    password="nvdevU6$",
-    account="REM20096",
+    user="",
+    password="",
+    account="",
     environment=Environment.REMARKET,
 )
 
@@ -57,21 +64,41 @@ almacenamiento_de_detalles = almacenamiento_de_detalles.get("instruments")
 # # item 4- validamos los intrumentos de interes: vamos a trabajar con acciones y opciones de merval
 for i in almacenamiento_de_detalles:
     simbolo = i.get("instrumentId").get("symbol")
-    if simbolo.startswith("MERV") and simbolo.endswith("48hs"):
-        lista_simbolo.append(simbolo)
+    # if simbolo.startswith("DLR") and simbolo.endswith("48hs"):
+    lista_simbolo.append(simbolo)
         # print(simbolo)
 
 entries = [MarketDataEntry.BIDS, MarketDataEntry.OFFERS, MarketDataEntry.LAST]
-# order_report_subscription(account="REM9893", environment=Environment.REMARKET)
+
+cuenta = get_account_report(account="REM20103",
+    environment=Environment.REMARKET)
+print(cuenta.get("accountData"))
 
 for simbolo in lista_simbolo:
-    print(f"Envio de orden para el ticker {simbolo}")
-    send_order_via_websocket(
-        ticker=simbolo,
-        side=Side.BUY,
-        size=10,
-        order_type=OrderType.LIMIT,
-        price=55.8,
-    )
+    print("iniciando orden")
+    a = send_order_via_websocket(ticker=simbolo,
+                           side=Side.BUY,
+                           size=10,
+                           price=55.8,
+                           order_type=OrderType.LIMIT
+                           )
+    # print(f"orden {a}")
     break
-order_report_subscription()
+
+#print(lista_simbolo)
+# order_report_subscription(account="REM9893", environment=Environment.REMARKET)
+
+# for simbolo in lista_simbolo:
+#     print(f"Envio de orden para el ticker {simbolo}")
+#     send_order_via_websocket(
+#         ticker=simbolo,
+#         side=Side.BUY,
+#         size=10,
+#         order_type=OrderType.LIMIT,
+#         price=55.8,
+#     )
+#     break
+
+# f = {'status': 'OK', 'accountData': 
+#     {'accountName': 'REM20103', 'marketMember': 'PrimaryVenture', 'marketMemberIdentity': 'PMYVTR', 'collateral': 0, 'margin': 0.0, 'availableToCollateral': 0.0, 'detailedAccountReports': {'0': {'currencyBalance': {'detailedCurrencyBalance': {}},
+#                                                                                                                                                                                                    'availableToOperate': {'cash': {'totalCash': 0, 'detailedCash': {}}, 'movements': 0, 'credit': None, 'total': 0, 'pendingMovements': 0}, 'settlementDate': 1730689200000}}, 'hasError': False, 'errorDetail': None, 'lastCalculation': 1730718691967, 'portfolio': 0, 'ordersMargin': 0.0, 'currentCash': 0, 'dailyDiff': 0, 'uncoveredMargin': 0}}
