@@ -1,5 +1,6 @@
 from pyRofex import *
 
+accion = "AL30D - 24hs"
 # Set the the parameter for the REMARKET environment
 # item 2-Llamado al método get token
 initialize(
@@ -120,7 +121,7 @@ print(f"\nestado de Orden Cancelada: {estado_de_orden_cancelada}")
 #send_order_via_websocket(tickers='MERV - XMEV - AY24C - 48hs')
 
 order = send_order_via_websocket(
-        ticker='MERV - XMEV - AGRO - 48hs',
+        ticker=accion,
         side=Side.BUY,
         size=10,
         price=55.8,

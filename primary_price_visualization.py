@@ -78,7 +78,7 @@ from datetime import datetime
 import matplotlib.pyplot as plt
 import time
 
-instrument = "DLR/NOV24"
+instrument = "DLR/JUL25"
 
 # Create empty DataFrame to store MarketData
 prices = pd.DataFrame(columns=["Time", "Bid", "Offer", "Last"])  
@@ -140,3 +140,22 @@ pyRofex.market_data_subscription(
 while True:
     update_plot()
     time.sleep(0.5)
+
+
+
+
+
+
+# métodos
+
+# get_detailed_instruments al iniciar el script
+# get_detailed_position cada 5 segundos
+# get_account_report cada 5 segundos
+
+# wS
+
+# init_websocket_connection
+# send_order_via_websocket
+# cancel_order_via_websocket
+# order_report_subscription
+# market_data_subscription

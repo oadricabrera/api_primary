@@ -7,7 +7,7 @@ initialize(
     account="REM20096",
     environment=Environment.REMARKET,
 )
-
+accion = "ORO/MAY25"
 # Definición de los manejadores
 def market_data_handler(message):
     print("Market Data Message Received: {0}".format(message))
@@ -31,7 +31,7 @@ init_websocket_connection(
 
 # Suscripción a datos del mercado
 market_data_subscription(
-    tickers=["GGAL/DIC24"],
+    tickers=[accion],
     entries=[MarketDataEntry.BIDS, MarketDataEntry.OFFERS],
     depth=4
 )
@@ -42,7 +42,7 @@ print(f"\nReporte de cuenta: {reporte_de_cuenta}")
 
 # Enviar una orden
 orden_enviada = send_order(
-    ticker="GGAL/DIC24",
+    ticker=accion,
     side=Side.BUY,
     size=1,
     price=6670,
