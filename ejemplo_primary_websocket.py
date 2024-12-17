@@ -10,7 +10,8 @@ initialize(
 accion = "SOY.CME/DIC24"
 # Definición de los manejadores
 def market_data_handler(message):
-    print("Market Data Message Received: {0}".format(message))
+    # print("Market Data Message Received: {0}".format(message))
+    print("---> ",type(message),message)
 
 def order_report_handler(message):
     print("Order Report Message Received: {0}".format(message))
