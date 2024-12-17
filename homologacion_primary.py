@@ -1,4 +1,13 @@
 from pyRofex import *
+import schedule
+
+def job():
+    detalle_de_posicion = get_detailed_position(
+    account="REM20096", environment=Environment.REMARKET
+    )
+    print(f"\n\detalle de cuenta: {detalle_de_posicion}")
+    reporte_de_cuenta = get_account_report()
+    print("#####\n\ reporte de cuenta ",reporte_de_cuenta)    
 
 # Inicialización de la sesión
 initialize(
@@ -14,6 +23,16 @@ def market_data_handler(message):
 
 def order_report_handler(message):
     print("Order Report Message Received: {0}".format(message))
+    # 6-Handler will validate if the order is in the correct state (pending_new)
+    print(f"\norder report handler {message}")
+    if message["orderReport"]["status"] == "NEW":
+        propietary = message["orderReport"]["proprietary"]
+        # 6.1-We cancel the order using the websocket connection
+        print("\nSend to Cancel Order with clOrdID: {0}".format(message["orderReport"]["clOrdId"]))
+        cancel_order_via_websocket(message["orderReport"]["clOrdId"],propietary,environment=Environment.REMARKET,)
+    # 7-Handler will receive an Order Report indicating that the order is cancelled (will print it)
+    elif message["orderReport"]["status"] == "CANCELLED":
+        print("\nOrder with ClOrdID '{0}' is Cancelled.".format(message["orderReport"]["clOrdId"]))
 
 def error_handler(message):
     print("Error Message Received: {0}".format(message))
@@ -46,31 +65,24 @@ detalle_de_posicion = get_detailed_position(
 print(f"\n\nReporte de Cuenta: {reporte_de_cuenta}, \n\ndetalle de cuenta: {detalle_de_posicion}")
 
 # Enviar una orden
-order = send_order_via_websocket(       #¿Hace falta hacer print para ver order?
+send_order_via_websocket(       #¿Hace falta hacer print para ver order?
         ticker=accion,
         side=Side.BUY,
         size=10,
-        price=359.9,
+        price=10.6,
         order_type=OrderType.LIMIT,
     )
+order_report_subscription(account="REM20096", environment=Environment.REMARKET) #¿Sirve?
+schedule.every(10).seconds.do(job)
+while True:
+    schedule.run_pending()
 
-print(f"\norder: {order}")  #veo None
-
-# Obtener reporte de cuenta
-reporte_de_cuenta = get_account_report()
-
-detalle_de_posicion = get_detailed_position(
-    account="REM20096", environment=Environment.REMARKET
-)
-print(f"\n\nReporte de Cuenta: {reporte_de_cuenta}, \n\ndetalle de cuenta: {detalle_de_posicion}")
 
 print("\norder_report_subscription()")
 
-order_report_subscription() #¿Sirve?
+# order_report_subscription() #¿Sirve?
 
 print("\norder_report_subscription(account=´REM20096´, environment=Environment.REMARKET)")
-
-order_report_subscription(account="REM20096", environment=Environment.REMARKET) #¿Sirve?
 
 """
 métodos
