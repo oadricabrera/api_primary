@@ -5,9 +5,9 @@ def job():
     detalle_de_posicion = get_detailed_position(
     account="REM20096", environment=Environment.REMARKET
     )
-    print(f"\n\detalle de cuenta: {detalle_de_posicion}")
+    print(f"\n\Detalle de Cuenta: {detalle_de_posicion}")
     reporte_de_cuenta = get_account_report()
-    print("#####\n\ reporte de cuenta ",reporte_de_cuenta)    
+    print("#####\n\ Reporte de Cuenta ",reporte_de_cuenta)    
 
 # Inicialización de la sesión
 initialize(
@@ -16,13 +16,20 @@ initialize(
     account="REM20096",
     environment=Environment.REMARKET,
 )
-accion = "SOY.CME/DIC24"
+accion = "DLR/MAR25"
 # Definición de los manejadores
 def market_data_handler(message):
-    print("Market Data Message Received: {0}".format(message))
+    simbolo= message.get("instrumentId").get("symbol")
+    if message.get("marketData").get("BI"):    
+        _marketData_BI= message.get("marketData").get("BI")[0].get("price")
+        _marketData_OF= message.get("marketData").get("OF")[0].get("price")
+        print(f"simbolo: {simbolo}'       'marketData BI: {_marketData_BI}'       'marketData OF: {_marketData_OF}")
+    #pisar los datos de la matriz acá   
+    print(lanzamientoCubierto[5])
+    print("\nMarket Data Message Received: {0}".format(message))
 
 def order_report_handler(message):
-    print("Order Report Message Received: {0}".format(message))
+    print("\nOrder Report Message Received: {0}".format(message))
     # 6-Handler will validate if the order is in the correct state (pending_new)
     print(f"\norder report handler {message}")
     if message["orderReport"]["status"] == "NEW":
@@ -48,10 +55,57 @@ init_websocket_connection(
     exception_handler=exception_handler,
 )
 
+SOJ = list()
+TRI = list()
+lanzamientoCubierto = list()
+mariposa=list()
+
+#Quiero saber qué papeles están cotizando
+
+almacenamiento_de_detalles = get_detailed_instruments()
+almacenamiento_de_detalles = almacenamiento_de_detalles.get("instruments")
+
+for i in almacenamiento_de_detalles:
+    symbol = i['instrumentId']['symbol']
+    if symbol.startswith('SOJ.ROS/NOV25'):
+        SOJ.append({"simbolo":symbol,"precio_compra":0,"cantidad_compra":0,"precio_venta":0,"cantidad_venta":0})
+        
+    elif symbol.startswith('TRI.ROS/JUL25'):
+        TRI.append(symbol)
+
+for symbol in SOJ[1:]:
+    _lanzamiento_cubierto = [SOJ[0],symbol]
+    lanzamientoCubierto.append(_lanzamiento_cubierto)
+
+for i in SOJ:
+    print(i.get("simbolo"),"   ",i.get("precio_compra"),"   ",i.get("cantidad_compra"),"   ",i.get("precio_venta"),"   ",i.get("cantidad_venta"))
+
+print("\n")
+
+for i in TRI:
+    print(i)
+
+# Imprimir las combinaciones
+print("\nLanzamiento Cubierto")
+for combo in lanzamientoCubierto:
+    print("\t".join(map(str, combo)))        #print("\t".join(combo))
+
+# Crear combinaciones de tres elementos consecutivos
+for i in range(len(TRI) - 2):
+    _mariposa = [TRI[i], TRI[i + 1], TRI[i + 2]]
+    mariposa.append(_mariposa)
+
+# Imprimir las combinaciones
+print("\nMariposa")
+for group in mariposa:
+    print("\t".join(group))
+
 # Suscripción a datos del mercado
 
+_tickers = SOJ + TRI
+
 market_data_subscription(
-    tickers=[accion],
+    tickers=_tickers,
     entries=[MarketDataEntry.BIDS, MarketDataEntry.OFFERS],
     depth=4
 )
@@ -63,26 +117,22 @@ detalle_de_posicion = get_detailed_position(
     account="REM20096", environment=Environment.REMARKET
 )
 print(f"\n\nReporte de Cuenta: {reporte_de_cuenta}, \n\ndetalle de cuenta: {detalle_de_posicion}")
-
+"""
 # Enviar una orden
-send_order_via_websocket(       #¿Hace falta hacer print para ver order?
+send_order_via_websocket(       
         ticker=accion,
         side=Side.BUY,
         size=10,
-        price=10.6,
+        price=1093,
         order_type=OrderType.LIMIT,
     )
+"""
 order_report_subscription(account="REM20096", environment=Environment.REMARKET) #¿Sirve?
-schedule.every(10).seconds.do(job)
+
+schedule.every(10000).seconds.do(job)                    #schedule.every(10).seconds.do(job)
 while True:
     schedule.run_pending()
 
-
-print("\norder_report_subscription()")
-
-# order_report_subscription() #¿Sirve?
-
-print("\norder_report_subscription(account=´REM20096´, environment=Environment.REMARKET)")
 
 """
 métodos
@@ -98,76 +148,4 @@ send_order_via_websocket
 cancel_order_via_websocket
 order_report_subscription probar
 market_data_subscription listo
-"""
-"""
-from pyRofex import initialize, Environment, MarketDataEntry, Side, OrderType
-
-# Inicialización de la sesión
-initialize(
-    user="oadricabrera20096",
-    password="nvdevU6$",
-    account="REM20096",
-    environment=Environment.REMARKET,
-)
-
-accion = "SOY.CME/DIC24"
-
-# Definición de los manejadores
-def market_data_handler(message):
-    print(f"Market Data Message Received: {message}")
-
-def order_report_handler(message):
-    print(f"Order Report Message Received: {message}")
-
-def error_handler(message):
-    print(f"Error Message Received: {message}")
-
-def exception_handler(e):
-    print(f"Exception Occurred: {str(e)}")
-
-# Iniciar conexión WebSocket
-init_websocket_connection(
-    market_data_handler=market_data_handler,
-    order_report_handler=order_report_handler,
-    error_handler=error_handler,
-    exception_handler=exception_handler,
-)
-
-# Suscripción a datos del mercado
-try:
-    market_data_subscription(
-        tickers=[accion],
-        entries=[MarketDataEntry.BIDS, MarketDataEntry.OFFERS],
-        depth=4
-    )
-except Exception as e:
-    print(f"Error al suscribirse a datos de mercado: {str(e)}")
-
-# Enviar una orden
-order = send_order_via_websocket(
-    ticker=accion,
-    side=Side.BUY,
-    size=10,
-    price=359.9,
-    order_type=OrderType.LIMIT,
-)
-
-if order is None:
-    print("Error: No se pudo enviar la orden.")
-else:
-    print(f"Orden enviada: {order}")
-
-# Obtener reporte de cuenta y posiciones
-try:
-    reporte_de_cuenta = get_account_report()
-    detalle_de_posicion = get_detailed_position(
-        account="REM20096", environment=Environment.REMARKET
-    )
-    print(f"\n\nReporte de Cuenta: {reporte_de_cuenta}")
-    print(f"\nDetalle de cuenta: {detalle_de_posicion}")
-except Exception as e:
-    print(f"Error al obtener reporte: {str(e)}")
-
-# Suscripción a reportes de órdenes
-order_report_subscription()
 """
