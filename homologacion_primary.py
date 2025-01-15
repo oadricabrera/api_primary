@@ -74,7 +74,20 @@ for i in almacenamiento_de_detalles:
         TRI.append(symbol)
 
 for symbol in SOJ[1:]:
-    _lanzamiento_cubierto = [SOJ[0],symbol]
+    # Extraer los valores específicos de SOJ[0] y symbol
+    valores_SOJ0 = list(SOJ[0].values())
+    valores_symbol = list(symbol.values())
+    
+    # Crear la combinación con los valores deseados
+    _lanzamiento_cubierto = [
+        valores_SOJ0[0],  # Primer valor de SOJ[0] ('SOJ.ROS/NOV25 300 P')
+        valores_SOJ0[2],  # Tercer valor de SOJ[0] (tercer cero)
+        valores_SOJ0[3],  # Cuarto valor de SOJ[0] (cuarto cero)
+        valores_symbol[0],  # Primer valor de symbol ('SOJ.ROS/NOV25 300 C')
+        valores_symbol[1],  # Primer cero de symbol
+        valores_symbol[2],  # Segundo cero de symbol
+    ]
+    
     lanzamientoCubierto.append(_lanzamiento_cubierto)
 
 for i in SOJ:
@@ -88,7 +101,7 @@ for i in TRI:
 # Imprimir las combinaciones
 print("\nLanzamiento Cubierto")
 for combo in lanzamientoCubierto:
-    print("\t".join(map(str, combo)))        #print("\t".join(combo))
+    print(*combo)        #print("\t".join(combo))
 
 # Crear combinaciones de tres elementos consecutivos
 for i in range(len(TRI) - 2):
