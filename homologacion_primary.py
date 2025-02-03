@@ -16,16 +16,51 @@ initialize(
     account="REM20096",
     environment=Environment.REMARKET,
 )
-accion = "DLR/MAR25"
+accion = "DLR/ENE25/FEB25" 
 # Definición de los manejadores
 def market_data_handler(message):
     simbolo= message.get("instrumentId").get("symbol")
-    if message.get("marketData").get("BI"):    
-        _marketData_BI= message.get("marketData").get("BI")[0].get("price")
-        _marketData_OF= message.get("marketData").get("OF")[0].get("price")
-        print(f"simbolo: {simbolo}'       'marketData BI: {_marketData_BI}'       'marketData OF: {_marketData_OF}")
-    #pisar los datos de la matriz acá   
-    print(lanzamientoCubierto[5])
+    # Extraer precios y tamaños de OF y BI
+    if message.get("marketData").get("BI") and (message.get("marketData").get("BI")[0].get("price") != message.get("marketData").get("OF")[0].get("price")):    
+        _size_BI= message.get("marketData").get("BI")[0].get("size")
+        _price_BI = message.get("marketData").get("BI")[0].get("price")
+        _price_OF= message.get("marketData").get("OF")[0].get("price")
+        _size_OF = message.get("marketData").get("OF")[0].get("size")
+        SOJ.append({"simbolo":symbol,"precio_compra":_price_BI,"cantidad_compra":_size_BI,"precio_venta":_price_OF,"cantidad_venta":_size_OF})
+        print(f"simbolo: {simbolo}'       '_size_BI:{_size_BI}'       '_price_BI: {_price_BI}'       '_price_OF: {_price_OF}'       '_size_OF:{_size_OF}")
+        """
+        # Buscar el símbolo en la lista SOJ y actualizar los valores
+        for item in SOJ:
+            if item["simbolo"] == simbolo:
+                item["precio_compra"] = _size_BI  # Reemplazar el primer cero
+                item["cantidad_compra"] = _price_BI  # Reemplazar el segundo cero
+                item["precio_venta"] = _price_OF  # Reemplazar el tercer cero
+                item["cantidad_venta"] = _size_OF  # Reemplazar el cuarto cero
+                break
+        """  
+    # Imprimir para verificar
+    print(f"\nActualizado: {simbolo}")
+    for i in SOJ:
+        if i.get("precio_compra") != i.get("precio_venta"):
+            print(i.get("simbolo"), "   ", i.get("precio_compra"), "   ", i.get("cantidad_compra"), "   ", i.get("precio_venta"), "   ", i.get("cantidad_venta"))
+
+    for symbol in SOJ[1:]:
+        # Extraer los valores específicos de SOJ[0] y symbol
+        valores_SOJ0 = list(SOJ[0].values())
+        valores_symbol = list(symbol.values())
+        
+        # Crear la combinación con los valores deseados
+        _lanzamiento_cubierto = [
+            valores_SOJ0[0],  # Primer valor de SOJ[0] ('SOJ.ROS/NOV25 300 P')
+            valores_SOJ0[2],  # Tercer valor de SOJ[0] (tercer cero)
+            valores_SOJ0[3],  # Cuarto valor de SOJ[0] (cuarto cero)
+            valores_symbol[0],  # Primer valor de symbol ('SOJ.ROS/NOV25 300 C')
+            valores_symbol[1],  # Primer cero de symbol
+            valores_symbol[2],  # Segundo cero de symbol
+        ]
+
+        print (f"_lanzamiento_cubierto: {_lanzamiento_cubierto}") if (valores_symbol[1] != valores_symbol[2]) else None
+
     print("\nMarket Data Message Received: {0}".format(message))
 
 def order_report_handler(message):
@@ -56,6 +91,7 @@ init_websocket_connection(
 )
 
 SOJ = list()
+SOJA = list()
 TRI = list()
 lanzamientoCubierto = list()
 mariposa=list()
@@ -67,12 +103,13 @@ almacenamiento_de_detalles = almacenamiento_de_detalles.get("instruments")
 
 for i in almacenamiento_de_detalles:
     symbol = i['instrumentId']['symbol']
-    if symbol.startswith('SOJ.ROS/NOV25'):
-        SOJ.append({"simbolo":symbol,"precio_compra":0,"cantidad_compra":0,"precio_venta":0,"cantidad_venta":0})
+    if symbol.startswith('SOJ.ROS'):
+        SOJA.append(symbol)
+        #SOJ.append({"simbolo":symbol,"precio_compra":0,"cantidad_compra":0,"precio_venta":0,"cantidad_venta":0})
         
-    elif symbol.startswith('TRI.ROS/JUL25'):
+    elif symbol.startswith('TRI.ROS'):
         TRI.append(symbol)
-
+"""
 for symbol in SOJ[1:]:
     # Extraer los valores específicos de SOJ[0] y symbol
     valores_SOJ0 = list(SOJ[0].values())
@@ -112,10 +149,10 @@ for i in range(len(TRI) - 2):
 print("\nMariposa")
 for group in mariposa:
     print("\t".join(group))
-
+"""
 # Suscripción a datos del mercado
 
-_tickers = SOJ + TRI
+_tickers = SOJA + TRI
 
 market_data_subscription(
     tickers=_tickers,
