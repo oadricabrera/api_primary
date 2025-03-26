@@ -7,7 +7,7 @@ initialize(
     account="REM20096",
     environment=Environment.REMARKET,
 )
-accion = "SOY.CME/DIC24"
+accion = "DLR/MAR25A"
 # Definición de los manejadores
 def market_data_handler(message):
     print("Market Data Message Received: {0}".format(message))
@@ -19,7 +19,7 @@ def error_handler(message):
     print("Error Message Received: {0}".format(message))
 
 def exception_handler(e):
-    print("Exception Occurred: {0}".format(e.message))
+    print("Exception Occurred: {0}".format(e))
 
 # Iniciar conexión WebSocket
 init_websocket_connection(
