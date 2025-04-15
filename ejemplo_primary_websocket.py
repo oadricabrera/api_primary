@@ -18,7 +18,7 @@ except Exception as e:
     print(f"Error al inicializar la sesión: {e}")
     exit(1)
 
-accion = "DLR/ABR25A"
+accion = "DLR/JUL25"
 
 # Definición de los manejadores
 def market_data_handler(message):
@@ -69,7 +69,7 @@ try:
         ticker=accion,
         side=Side.BUY,
         size=1,
-        price=6670,
+        price=1310,
         order_type=OrderType.LIMIT
     )
     print(f"\nOrden Enviada: {orden_enviada}")
