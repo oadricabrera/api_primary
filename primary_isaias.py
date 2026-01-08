@@ -1,6 +1,6 @@
 from pyRofex import *
 
-accion = "AL30D - 24hs"
+accion = "GGAL/FEB26"
 # Set the the parameter for the REMARKET environment
 # item 2-Llamado al método get token
 initialize(

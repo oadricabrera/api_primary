@@ -7,7 +7,7 @@ initialize(
     account="REM20096",
     environment=Environment.REMARKET,
 )
-accion = "DLR/FEB25A"
+accion = "DLR/FEB26"
 # Definición de los manejadores
 def market_data_handler(message):
     print("Market Data Message Received: {0}".format(message))
