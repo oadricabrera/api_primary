@@ -24,6 +24,11 @@ def order_report_handler(message):
 def error_handler(message):
     print(f"Error de Rofex: {message}")
 
+def exception_handler(e):
+    """Atrapa excepciones graves del WebSocket para que el bot no crashee"""
+    print(f"Excepción de WebSocket detectada: {e}")
+    # Aquí podrías agregar un sistema de notificaciones (Telegram/Mail) en el futuro
+
 # --- BUCLE DE CONTROL (REST) ---
 async def rest_heartbeat():
     """
@@ -70,22 +75,42 @@ async def rest_heartbeat():
 
 # --- INICIO ---
 async def main():
-    # Inicializar con entorno REMARKET
-    pyRofex.initialize(user=USER, password=PASSWORD, account=ACCOUNT, environment=pyRofex.Environment.REMARKET)
-    
-    # Iniciar WebSocket
-    pyRofex.init_websocket_connection(
-        market_data_handler=market_data_handler,
-        order_report_handler=order_report_handler,
-        error_handler=error_handler
-    )
+    while True:
+        try:
+            print("Iniciando conexión con Matba Rofex...")
+            
+            # Inicializar entorno
+            pyRofex.initialize(
+                user=USER, 
+                password=PASSWORD, 
+                account=ACCOUNT, 
+                environment=pyRofex.Environment.REMARKET
+            )
+            
+            # Configurar el WebSocket con manejadores
+            pyRofex.init_websocket_connection(
+                market_data_handler=market_data_handler,
+                order_report_handler=order_report_handler,
+                error_handler=error_handler,
+                exception_handler=exception_handler # Este es clave para la resiliencia
+            )
 
-    # Suscripciones
-    pyRofex.order_report_subscription()
-    pyRofex.market_data_subscription(tickers=["DLR/ENE26"], entries=[pyRofex.MarketDataEntry.BIDS])
+            # Suscripciones
+            pyRofex.order_report_subscription()
+            pyRofex.market_data_subscription(
+                tickers=["GGAL", "AL30"], 
+                entries=[pyRofex.MarketDataEntry.BIDS, pyRofex.MarketDataEntry.OFFERS]
+            )
 
-    # Ejecutar el Heartbeat infinito
-    await rest_heartbeat()
+            print("Conexión establecida. Iniciando Heartbeat...")
+            
+            # Ejecutar el Heartbeat. Si falla o se desconecta, el 'await' terminará
+            # y el bucle 'while True' volverá a intentar la conexión.
+            await rest_heartbeat()
+
+        except Exception as e:
+            print(f"Conexión perdida o fallida: {e}. Reintentando en 10 segundos...")
+            await asyncio.sleep(10)
 
 if __name__ == "__main__":
     asyncio.run(main())
